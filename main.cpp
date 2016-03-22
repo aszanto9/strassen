@@ -155,6 +155,7 @@ void testInitMatrix(){
     Matrix* m = new Matrix();
     initMatrix(m,3);
     printMatrix(*m);
+    free(m);
 }
 
 void testConvMult(){
