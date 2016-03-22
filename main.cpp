@@ -29,17 +29,14 @@ void initMatrix(Matrix* M, int dimension){
 }
 
 
-Matrix* conventional(Matrix* A, Matrix* B, int dimension) {
+Matrix* convMult(Matrix* A, Matrix* B, int dimension) {
 
 	Matrix* AB = new Matrix();
 	initMatrix(AB, dimension);
 
-	for (int i = 0; i < dimension; ++i)
-	{
-		for (int j = 0; j < dimension; ++j)
-		{
-			for (int k	 = 0; k < dimension; ++k)
-			{	
+	for (int i = 0; i < dimension; ++i)	{
+		for (int j = 0; j < dimension; ++j)	{
+			for (int k	 = 0; k < dimension; ++k) {	
 				AB->matrix[i][j] += A->matrix[i][k]*B->matrix[k][j];	
 			}
 		}
@@ -58,17 +55,39 @@ void printMatrix(Matrix* A){
     cout << endl;
 }
 
+
+bool isEqual(Matrix* A, Matrix* B){
+	if (A->dimension != B->dimension) {
+		return false;
+	}
+	else
+	{ 
+		for (int i = 0; i < A->dimension; ++i) {
+			for (int j = 0; j < A->dimension; ++j) {
+				if (A->matrix[i][j]!=B->matrix[i][j]){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+}
+
+
+
 void testInitMatrix(){
     Matrix* m = new Matrix();
     initMatrix(m,3);
     printMatrix(m);
 }
 
-void testConventional(){
+void testConvMult(){
 	Matrix* A = new Matrix();
     initMatrix(A,3);
     Matrix* B = new Matrix();
     initMatrix(B,3);
+    Matrix* C = new Matrix();
+    initMatrix(C,3);
 
     A->matrix[0][0] = 1;
     A->matrix[0][1] = 2;
@@ -89,15 +108,27 @@ void testConventional(){
     B->matrix[2][0] = 2;
     B->matrix[2][1] = 1;
     B->matrix[2][2] = -3;
+
+    C->matrix[0][0] = -8;
+    C->matrix[0][1] = -4;
+    C->matrix[0][2] = 11;
+    C->matrix[1][0] = -4;
+    C->matrix[1][1] = -2;
+    C->matrix[1][2] = 3;
+    C->matrix[2][0] = 8;
+    C->matrix[2][1] = 4;
+    C->matrix[2][2] = -4;
+
  
-    printMatrix(conventional(A,B,3));
+    assert (isEqual(convMult(A,B,3),C));
 
 }
 
 
 
 int main(){
-        return 0;
+	testConvMult();
+    return 0;
 }
 
 
