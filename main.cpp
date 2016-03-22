@@ -15,6 +15,7 @@
 
 using namespace std;
 
+
 struct Matrix {
     int dimension;
     vector<vector<int>> matrix;
@@ -78,7 +79,7 @@ void convMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, in
                     C->matrix[topC + i][leftC + j] += A->matrix[topA + i][leftA + k] * B->matrix[topB + k][leftB + j];
 }
 
-void multiply(Matrix*, Matrix*, Matrix*, int , int , int , int , int , int , int , int);
+void multiply(Matrix*, Matrix*, Matrix*, int , int , int , int , int , int , int , int); // forward declare for mutual recursion
 
 void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension) {
     Matrix* T1 = new Matrix();
@@ -137,8 +138,8 @@ void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB
     //C11 = C11 - T1
     subtract(C,T1,C,0,0,0,0,0,0,dimension/2);
 
-    delete(T1);
-    delete(T2);
+    free(T1);
+    free(T2);
 }
 
 void multiply(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension, int threshold){
@@ -174,6 +175,9 @@ void testConvMult(){
     convMult(A,B,D,0,0,0,0,0,0,3);
  
     assert(isEqual(D, C));
+    free(A);
+    free(B);
+    free(C);
 
 }
 
@@ -193,6 +197,10 @@ void testStrasMult(){
     
     multiply(A, B, D, 0, 0, 0, 0, 0, 0, 2, 2);
     assert(isEqual(D, C));
+    free(A);
+    free(B);
+    free(C);
+    
     
 
 }
