@@ -37,7 +37,7 @@ Matrix* convMult(Matrix& A, Matrix& B, int dimension) {
 	for (int i = 0; i < dimension; ++i)	{
 		for (int j = 0; j < dimension; ++j)	{
 			for (int k = 0; k < dimension; ++k) {	
-				AB.matrix[i][j] += A.matrix[i][k] * B.matrix[k][j];	
+				AB->matrix[i][j] += A.matrix[i][k] * B.matrix[k][j];
 			}
 		}
 	}
@@ -78,7 +78,7 @@ bool isEqual(Matrix& A, Matrix& B){
 void testInitMatrix(){
     Matrix* m = new Matrix();
     initMatrix(m,3);
-    printMatrix(m);
+    printMatrix(*m);
 }
 
 void testConvMult(){
@@ -120,7 +120,8 @@ void testConvMult(){
     C->matrix[2][2] = -4;
 
  
-    assert (isEqual(convMult(*A,*B,3),C));
+    assert (isEqual(*convMult(*A,*B,3),*C));
+    cout << "All tests pass!" << endl;
 
 }
 
