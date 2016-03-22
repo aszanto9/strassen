@@ -62,6 +62,12 @@ Matrix* convMult(Matrix& A, Matrix& B, int dimension) {
 	return AB;
 }
 
+Matrix* strassenMult(Matrix* A, Matrix* B, int topA, int leftA, int topB, int leftB, int dimension) {
+    Matrix* C = new Matrix();
+    initMatrix(C, dimension);
+    
+    
+}
 
 void printMatrix(Matrix& A){
 	for (int i = 0; i < A.dimension; i ++){
