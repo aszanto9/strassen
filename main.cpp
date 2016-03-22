@@ -18,7 +18,7 @@ using namespace std;
 
 struct Matrix {
     int dimension;
-    vector<vector<int>> matrix;
+    vector<vector<long long>> matrix;
 };
 
 void initMatrix(Matrix* M, int dimension){
@@ -88,55 +88,55 @@ void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB
     initMatrix(T2, dimension/2); // TODO deal with non-power of 2 case
     
     // C12 = A21 - A11
-    subtract(A, A, C, dimension/2, 0, 0, 0, 0, dimension/2, dimension/2);
+    subtract(A, A, C, topA + dimension/2, leftA, topA, leftA, topC, leftC + dimension/2, dimension/2);
     // C21 = B11 + B12
-    add(B,B,C,0,0,0,dimension/2,dimension/2,0,dimension/2);
+    add(B,B,C,topB,leftB,topB,leftB + dimension/2,topC + dimension/2,leftC,dimension/2);
     // C22 = C12 * C21
-    multiply(C,C,C,0,dimension/2,dimension/2,0,dimension/2,dimension/2,dimension/2,2);
+    multiply(C,C,C,topC,leftC + dimension/2,topC + dimension/2,leftC,topC + dimension/2,leftC + dimension/2,dimension/2,2);
     //C12 = A12 - A22
-    subtract(A,A,C,0,dimension/2,dimension/2,dimension/2,0,dimension/2,dimension/2);
+    subtract(A,A,C,topA,leftA + dimension/2,topA + dimension/2,leftA + dimension/2,topC,leftC + dimension/2,dimension/2);
     //C21 = B21 + B22
-    add(B, B, C, dimension/2,0,dimension/2,dimension/2,dimension/2,0,dimension/2);
+    add(B, B, C, topB + dimension/2,leftB,topB + dimension/2,leftB + dimension/2,topC + dimension/2,leftC,dimension/2);
     //C11 = C12 * C21
-    multiply(C,C,C,0,dimension/2,dimension/2,0,0,0,dimension/2,2);
+    multiply(C,C,C,topC,leftC + dimension/2,topC + dimension/2,leftC,topC,leftC,dimension/2,2);
     //C12 = A11 + A22
-    add(A, A, C, 0, 0, dimension/2, dimension/2, 0, dimension/2, dimension/2);
+    add(A, A, C, topA, leftA, topA + dimension/2, leftA + dimension/2, topC, leftC + dimension/2, dimension/2);
     //C21 = B11 + B22
-    add(B,B,C,0,0,dimension/2,dimension/2,dimension/2,0,dimension/2);
+    add(B,B,C,topB,leftB,topB + dimension/2,leftB + dimension/2,topC + dimension/2,leftC,dimension/2);
     //T1 = C12*C21
-    multiply(C,C,T1,0,dimension/2,dimension/2,0,0,0,dimension/2,2);
+    multiply(C,C,T1,topC,leftC + dimension/2,topC + dimension/2,leftC,0,0,dimension/2,2);
     //C11 = T1 + C11
-    add(T1,C,C,0,0,0,0,0,0,dimension/2);
+    add(T1,C,C,0,0,topC,leftC,topC,leftC,dimension/2);
     //C22 = T1 + C22
-    add(T1,C,C,0,0,dimension/2,dimension/2,dimension/2,dimension/2,dimension/2);
+    add(T1,C,C,0,0,topC + dimension/2,leftC + dimension/2,topC + dimension/2,leftC + dimension/2,dimension/2);
     //T2 = A21 + A22
-    add(A,A,T2,dimension/2,0,dimension/2,dimension/2,0,0,dimension/2);
+    add(A,A,T2,topA + dimension/2,leftA,topA + dimension/2,leftA + dimension/2,0,0,dimension/2);
     //C21 = T2 * B11
-    multiply(T2,B,C,0,0,0,0,dimension/2,0,dimension/2,2);
+    multiply(T2,B,C,0,0,topB,leftB,topC + dimension/2,leftC,dimension/2,2);
     //C22 = C22 - C21
-    subtract(C,C,C,dimension/2,dimension/2,dimension/2,0,dimension/2,dimension/2,dimension/2);
+    subtract(C,C,C,topC + dimension/2,leftC + dimension/2,topC + dimension/2,leftC,topC + dimension/2,leftC + dimension/2,dimension/2);
     //T1 = B21 - B11
-    subtract(B,B,T1,dimension/2,0,0,0,0,0,dimension/2);
+    subtract(B,B,T1,topB + dimension/2,leftB,topB,leftB,0,0,dimension/2);
     //T2 = A22 * T1
-    multiply(A,T1,T2,dimension/2,dimension/2,0,0,0,0,dimension/2,2);
+    multiply(A,T1,T2,topA + dimension/2,leftA + dimension/2,0,0,0,0,dimension/2,2);
     //C21 = C21 + T2
-    add(C,T2,C,dimension/2,0,0,0,dimension/2,0,dimension/2);
+    add(C,T2,C,topC + dimension/2,leftC,0,0,topC + dimension/2,leftC,dimension/2);
     //C11 = C11 + T2
-    add(C,T2,C,0,0,0,0,0,0,dimension/2);
+    add(C,T2,C,topC,leftC,0,0,topC,leftC,dimension/2);
     //T1 = B12 - B22
-    subtract(B,B,T1,0,dimension/2,dimension/2,dimension/2,0,0,dimension/2);
+    subtract(B,B,T1,topB,leftB + dimension/2,topB + dimension/2,leftB + dimension/2,0,0,dimension/2);
     //C12 = A11 * T1
-    multiply(A,T1,C,0,0,0,0,0,dimension/2,dimension/2,2);
+    multiply(A,T1,C,topA,leftA,0,0,topC,leftC + dimension/2,dimension/2,2);
     //C22 = C22 + C12
-    add(C,C,C,dimension/2,dimension/2,0,dimension/2,dimension/2,dimension/2,dimension/2);
+    add(C,C,C,topC + dimension/2,leftC + dimension/2,topC,leftC + dimension/2,topC + dimension/2,leftC + dimension/2,dimension/2);
     //T2 = A11 + A12
-    add(A,A,T2,0,0,0,dimension/2,0,0,dimension/2);
+    add(A,A,T2,topA,leftA,topA,leftA + dimension/2,0,0,dimension/2);
     //T1 = T2 * B22
-    multiply(T2,B,T1,0,0,dimension/2,dimension/2,0,0,dimension/2,2);
+    multiply(T2,B,T1,0,0,topB + dimension/2,leftB + dimension/2,0,0,dimension/2,2);
     //C12 = C12 + T1
-    add(C,T1,C,0,dimension/2,0,0,0,dimension/2,dimension/2);
+    add(C,T1,C,topC,leftC + dimension/2,0,0,topC,leftC + dimension/2,dimension/2);
     //C11 = C11 - T1
-    subtract(C,T1,C,0,0,0,0,0,0,dimension/2);
+    subtract(C,T1,C,topC,leftC,0,0,topC,leftC,dimension/2);
 
     free(T1);
     free(T2);
@@ -178,6 +178,7 @@ void testConvMult(){
     free(A);
     free(B);
     free(C);
+    cout << "all conventional tests pass" << endl;
 
 }
 
@@ -225,13 +226,37 @@ void testStrasMult(){
                     1076, 588, 639, 1198, 718}, {830, 712, 613, 679, 488, 593, 852,
                         711}};
     
-    multiply(E,F,H,0,0,0,0,0,0,8,9);
-    printMatrix(*E);
-    printMatrix(*F);
-    printMatrix(*H);
+    multiply(E,F,H,0,0,0,0,0,0,8,2);
+    assert(isEqual(H,G));
+    free(E);
+    free(F);
+    free(G);
+    free(H);
     
+    Matrix* I = new Matrix();
+    initMatrix(I,4);
+    Matrix* J = new Matrix();
+    initMatrix(J,4);
+    Matrix* K = new Matrix();
+    initMatrix(K,4);
+    Matrix* L = new Matrix();
+    initMatrix(L,4);
     
-
+    I->matrix = {{16, 9, 0, 5}, {19, 6, 9, 4}, {12, 11, 16, 12}, {20, 6, 16, 2}};
+    J->matrix = {{7, 12, 11, 13}, {8, 5, 13, 20}, {18, 13, 7, 4}, {6, 1, 19, 11}};
+    
+    K->matrix = {{214, 242, 388, 443}, {367, 379, 426, 447}, {532, 419, 615,
+        572}, {488, 480, 448, 466}};
+    
+    multiply(I,J,L,0,0,0,0,0,0,4,2);
+    
+    assert(isEqual(K, L));
+    free(I);
+    free(J);
+    free(K);
+    free(L);
+    
+    cout << "all Strassen tests pass" << endl;
 }
 
 
