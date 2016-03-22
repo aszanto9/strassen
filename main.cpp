@@ -28,24 +28,17 @@ void initMatrix(Matrix* M, int dimension){
     }
 }
 
-Matrix* add(Matrix& A, Matrix& B){
-    Matrix* sum = new Matrix();
-    initMatrix(sum,A.dimension);
-    for (int i = 0; i < A.dimension; ++i)
-        for (int j = 0; j < A.dimension; ++j)
-            sum->matrix[i][j] = A.matrix[i][j] + B.matrix[i][j];
-    return sum;
+void add(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension){
+    for (int i = 0; i < dimension; i++)
+        for (int j = 0; j < dimension; j++)
+            C->matrix[topC + i][leftC + j] = A->matrix[topA + i][leftA + j] + B->matrix[topB + i][leftB + j];
 }
 
-Matrix* subtract(Matrix& A, Matrix& B){
-    Matrix* sum = new Matrix();
-    initMatrix(sum,A.dimension);
-    for (int i = 0; i < A.dimension; ++i)
-        for (int j = 0; j < A.dimension; ++j)
-            sum->matrix[i][j] = A.matrix[i][j] - B.matrix[i][j];
-    return sum;
+void subtract(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension){
+    for (int i = 0; i < dimension; i++)
+        for (int j = 0; j < dimension; j++)
+            C->matrix[topC + i][leftC + j] = A->matrix[topA + i][leftA + j] - B->matrix[topB + i][leftB + j];
 }
-
 
 Matrix* convMult(Matrix& A, Matrix& B, int dimension) {
 
@@ -153,6 +146,7 @@ void testConvMult(){
 
 int main(){
 	//testConvMult();
+    
     return 0;
 }
 
