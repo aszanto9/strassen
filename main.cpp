@@ -11,14 +11,13 @@
 #include <string>
 #include <cstdlib>
 #include <algorithm>
-#include <random>
 
 using namespace std;
 
 
 struct Matrix {
     int dimension;
-    vector<vector<long long>> matrix;
+    vector<vector<int>> matrix;
 };
 
 void initMatrix(Matrix* M, int dimension){
