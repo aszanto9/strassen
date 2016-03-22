@@ -29,15 +29,15 @@ void initMatrix(Matrix* M, int dimension){
 }
 
 
-Matrix* convMult(Matrix* A, Matrix* B, int dimension) {
+Matrix* convMult(Matrix& A, Matrix& B, int dimension) {
 
 	Matrix* AB = new Matrix();
 	initMatrix(AB, dimension);
 
 	for (int i = 0; i < dimension; ++i)	{
 		for (int j = 0; j < dimension; ++j)	{
-			for (int k	 = 0; k < dimension; ++k) {	
-				AB->matrix[i][j] += A->matrix[i][k]*B->matrix[k][j];	
+			for (int k = 0; k < dimension; ++k) {	
+				AB.matrix[i][j] += A.matrix[i][k] * B.matrix[k][j];	
 			}
 		}
 	}
@@ -45,10 +45,10 @@ Matrix* convMult(Matrix* A, Matrix* B, int dimension) {
 }
 
 
-void printMatrix(Matrix* A){
-	for (int i = 0; i < A->dimension; i ++){
-        for (int j = 0; j < A->dimension; j++){
-            cout << A->matrix[i][j] << " ";
+void printMatrix(Matrix& A){
+	for (int i = 0; i < A.dimension; i ++){
+        for (int j = 0; j < A.dimension; j++){
+            cout << A.matrix[i][j] << " ";
         }
         cout << endl;
     }
@@ -56,15 +56,15 @@ void printMatrix(Matrix* A){
 }
 
 
-bool isEqual(Matrix* A, Matrix* B){
-	if (A->dimension != B->dimension) {
+bool isEqual(Matrix& A, Matrix& B){
+	if (A.dimension != B.dimension) {
 		return false;
 	}
 	else
 	{ 
-		for (int i = 0; i < A->dimension; ++i) {
-			for (int j = 0; j < A->dimension; ++j) {
-				if (A->matrix[i][j]!=B->matrix[i][j]){
+		for (int i = 0; i < A.dimension; ++i) {
+			for (int j = 0; j < A.dimension; ++j) {
+				if (A.matrix[i][j]!=B.matrix[i][j]){
 					return false;
 				}
 			}
@@ -82,7 +82,7 @@ void testInitMatrix(){
 }
 
 void testConvMult(){
-	Matrix* A = new Matrix();
+    Matrix* A = new Matrix();
     initMatrix(A,3);
     Matrix* B = new Matrix();
     initMatrix(B,3);
@@ -120,7 +120,7 @@ void testConvMult(){
     C->matrix[2][2] = -4;
 
  
-    assert (isEqual(convMult(A,B,3),C));
+    assert (isEqual(convMult(*A,*B,3),C));
 
 }
 
