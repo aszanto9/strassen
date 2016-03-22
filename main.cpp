@@ -15,10 +15,10 @@
 
 using namespace std;
 
-typedef struct Matrix {
+struct Matrix {
     int dimension;
     vector<vector<int>> matrix;
-} Matrix;
+};
 
 void initMatrix(Matrix* M, int dimension){
     M->dimension = dimension;
@@ -26,6 +26,24 @@ void initMatrix(Matrix* M, int dimension){
     for (int i = 0; i < dimension; i++){
         M->matrix[i].resize(dimension);
     }
+}
+
+Matrix* add(Matrix& A, Matrix& B){
+    Matrix* sum = new Matrix();
+    initMatrix(sum,A.dimension);
+    for (int i = 0; i < A.dimension; ++i)
+        for (int j = 0; j < A.dimension; ++j)
+            sum->matrix[i][j] = A.matrix[i][j] + B.matrix[i][j];
+    return sum;
+}
+
+Matrix* subtract(Matrix& A, Matrix& B){
+    Matrix* sum = new Matrix();
+    initMatrix(sum,A.dimension);
+    for (int i = 0; i < A.dimension; ++i)
+        for (int j = 0; j < A.dimension; ++j)
+            sum->matrix[i][j] = A.matrix[i][j] - B.matrix[i][j];
+    return sum;
 }
 
 
@@ -128,7 +146,7 @@ void testConvMult(){
 
 
 int main(){
-	testConvMult();
+	//testConvMult();
     return 0;
 }
 
