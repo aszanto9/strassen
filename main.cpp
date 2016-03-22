@@ -28,41 +28,76 @@ void initMatrix(Matrix* M, int dimension){
     }
 }
 
-void testInitMatrix(){
-    Matrix* m = new Matrix();
-    initMatrix(m,3);
-    for (int i = 0; i < 3; i ++){
-        for (int j = 0; j < 3; j++){
-            cout << m->matrix[i][j];
+
+Matrix* conventional(Matrix* A, Matrix* B, int dimension) {
+
+	Matrix* AB = new Matrix();
+	initMatrix(AB, dimension);
+
+	for (int i = 0; i < dimension; ++i)
+	{
+		for (int j = 0; j < dimension; ++j)
+		{
+			for (int k	 = 0; k < dimension; ++k)
+			{	
+				AB->matrix[i][j] += A->matrix[i][k]*B->matrix[k][j];	
+			}
+		}
+	}
+	return AB;
+}
+
+
+void printMatrix(Matrix* A){
+	for (int i = 0; i < A->dimension; i ++){
+        for (int j = 0; j < A->dimension; j++){
+            cout << A->matrix[i][j] << " ";
         }
         cout << endl;
     }
     cout << endl;
 }
 
-Matrix conventional(Matrix A, Matrix B, int dimension) {
+void testInitMatrix(){
+    Matrix* m = new Matrix();
+    initMatrix(m,3);
+    printMatrix(m);
+}
 
-	Matrix* AB = new Matrix();
-	initializ(AB, dimension);
+void testConventional(){
+	Matrix* A = new Matrix();
+    initMatrix(A,3);
+    Matrix* B = new Matrix();
+    initMatrix(B,3);
 
-	for (int i = 0; i < dimension; ++i)
-	{
-		for (int j = 0; j < dimension; ++i)
-		{
-			for (int i = 0; k < dimension; ++i)
-			{	
-				AM->matrix[i][j] += A->matrix[i][k]*B->matrix[k][j]
-			}
-		}
-	}
-	return AB*
+    A->matrix[0][0] = 1;
+    A->matrix[0][1] = 2;
+    A->matrix[0][2] = -3;
+    A->matrix[1][0] = 1;
+    A->matrix[1][1] = 3;
+    A->matrix[1][2] = 0;
+    A->matrix[2][0] = 2;
+    A->matrix[2][1] = -1;
+    A->matrix[2][2] = 1;
+
+    B->matrix[0][0] = 2;
+    B->matrix[0][1] = 1;
+    B->matrix[0][2] = 0;
+    B->matrix[1][0] = -2;
+    B->matrix[1][1] = -1;
+    B->matrix[1][2] = 1;
+    B->matrix[2][0] = 2;
+    B->matrix[2][1] = 1;
+    B->matrix[2][2] = -3;
+ 
+    printMatrix(conventional(A,B,3));
+
 }
 
 
 
 int main(){
         return 0;
-        
 }
 
 
