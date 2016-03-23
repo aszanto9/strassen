@@ -10,6 +10,7 @@
 #include <ctime>
 #include <string>
 #include <cstdlib>
+#include <random>
 #include <algorithm>
 
 using namespace std;
@@ -178,8 +179,24 @@ void multiply(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, in
         convMult(A, B, C, topA, leftA, topB, leftB, topC, leftC, dimension);
 }
 
+void populateRandomMatrix(Matrix* M, int low, int high){
+    random_device r;
+    mt19937 mtgen(r());
+    uniform_int_distribution<> dist(low,high);
+    for (int i = 0; i < M->dimension; i++)
+        for (int j = 0; j < M->dimension; j++)
+            M->matrix[i][j] = dist(mtgen);
+}
 
 
+
+void testRandMatrix(){
+    Matrix* m = new Matrix();
+    initMatrix(m,10);
+    populateRandomMatrix(m, 0,1);
+    printMatrix(*m);
+    free(m);
+}
 
 void testInitMatrix(){
     Matrix* m = new Matrix();
@@ -397,6 +414,7 @@ int main(){
 	testConvMult();
     testfindOptDim();
     testInitPadding();
+    testRandMatrix();
     return 0;
 }
 
