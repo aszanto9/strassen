@@ -179,6 +179,26 @@ void multiply(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, in
         convMult(A, B, C, topA, leftA, topB, leftB, topC, leftC, dimension);
 }
 
+// final multiplication method- returns null if A and B are not of the same dimension
+Matrix* multiply(Matrix* A, Matrix* B, int threshold){
+    if (A->dimension != B->dimension)
+        return NULL;
+    int dimension = A->dimension;
+    Matrix* C = new Matrix();
+    initMatrix(C, A->dimension);
+    
+    int padding = findOptDim(dimension, threshold);
+    initPadding(A, padding);
+    initPadding(B, padding);
+    initPadding(C, padding);
+    multiply(A,B,C,0,0,0,0,0,0,padding,threshold);
+    
+    removePadding(A, dimension);
+    removePadding(B, dimension);
+    removePadding(C, dimension);
+    return C;
+}
+
 void populateRandomMatrix(Matrix* M, int low, int high){
     random_device r;
     mt19937 mtgen(r());
@@ -314,8 +334,6 @@ void testStrasMult(){
     initMatrix(N,14);
     Matrix* O = new Matrix();
     initMatrix(O,14);
-    Matrix* P = new Matrix();
-    initMatrix(P,14);
     
     M->matrix = {{-12, -2, -18, 12, 6, -13, -15, 12, -17, -18, 
   5, -19, -13, -7}, {14, -11, 20, 9, 2, -4, 11, -5, 12, 11, 1, 15, 0, 
@@ -366,14 +384,7 @@ void testStrasMult(){
   149}, {366, -870, -119, -188, -165, 237, 567, -60, -6, -821, 888, 
   346, 393, -1238}};
     
-    int newdim = findOptDim(14,5);
-    initPadding(M,newdim);
-    initPadding(N,newdim);
-    initPadding(P,newdim);
-
-    multiply(M,N,P,0,0,0,0,0,0,newdim,2);
-
-    removePadding(P,14);
+    Matrix* P = multiply(M,N,2);
     
     assert(isEqual(O, P));
     
