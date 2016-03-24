@@ -10,6 +10,7 @@
 #include <ctime>
 #include <string>
 #include <cstdlib>
+#include <random>
 #include <algorithm>
 
 using namespace std;
@@ -53,6 +54,36 @@ bool isEqual(Matrix* A, Matrix* B){
             }
         }
         return true;
+    }
+}
+
+int findOptDim(int n, int threshold){
+    int counter = 0;
+    while (n > threshold){
+        if (n%2 == 0)
+            n /= 2;
+        else
+            n = (n+1)/2;
+        counter ++;
+    }
+    return n*pow(2,counter);
+}
+
+void initPadding(Matrix* M, int newdim){
+    M->dimension = newdim;
+
+    M->matrix.resize(newdim);
+    for (int i = 0; i < newdim; i++){
+        M->matrix[i].resize(newdim);
+    }
+}
+
+void removePadding(Matrix* M, int newdim){
+    M->dimension = newdim;
+
+    M->matrix.resize(newdim);
+    for (int i = 0; i < newdim; i++){
+        M->matrix[i].resize(newdim);
     }
 }
 
@@ -148,8 +179,44 @@ void multiply(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, in
         convMult(A, B, C, topA, leftA, topB, leftB, topC, leftC, dimension);
 }
 
+// final multiplication method- returns null if A and B are not of the same dimension
+Matrix* multiply(Matrix* A, Matrix* B, int threshold){
+    if (A->dimension != B->dimension)
+        return NULL;
+    int dimension = A->dimension;
+    Matrix* C = new Matrix();
+    initMatrix(C, A->dimension);
+    
+    int padding = findOptDim(dimension, threshold);
+    initPadding(A, padding);
+    initPadding(B, padding);
+    initPadding(C, padding);
+    multiply(A,B,C,0,0,0,0,0,0,padding,threshold);
+    
+    removePadding(A, dimension);
+    removePadding(B, dimension);
+    removePadding(C, dimension);
+    return C;
+}
+
+void populateRandomMatrix(Matrix* M, int low, int high){
+    random_device r;
+    mt19937 mtgen(r());
+    uniform_int_distribution<> dist(low,high);
+    for (int i = 0; i < M->dimension; i++)
+        for (int j = 0; j < M->dimension; j++)
+            M->matrix[i][j] = dist(mtgen);
+}
 
 
+
+void testRandMatrix(){
+    Matrix* m = new Matrix();
+    initMatrix(m,10);
+    populateRandomMatrix(m, 0,1);
+    printMatrix(*m);
+    free(m);
+}
 
 void testInitMatrix(){
     Matrix* m = new Matrix();
@@ -183,6 +250,7 @@ void testConvMult(){
 }
 
 void testStrasMult(){
+    //First test
     Matrix* A = new Matrix();
     initMatrix(A,2);
     Matrix* B = new Matrix();
@@ -201,7 +269,9 @@ void testStrasMult(){
     free(A);
     free(B);
     free(C);
-    
+
+
+    //second test powers of 2
     Matrix* E = new Matrix();
     initMatrix(E,8);
     Matrix* F = new Matrix();
@@ -255,17 +325,129 @@ void testStrasMult(){
     free(J);
     free(K);
     free(L);
+
+
+    //third test non powers of 2, positive and negative
+    Matrix* M = new Matrix();
+    initMatrix(M,14);
+    Matrix* N = new Matrix();
+    initMatrix(N,14);
+    Matrix* O = new Matrix();
+    initMatrix(O,14);
+    
+    M->matrix = {{-12, -2, -18, 12, 6, -13, -15, 12, -17, -18, 
+  5, -19, -13, -7}, {14, -11, 20, 9, 2, -4, 11, -5, 12, 11, 1, 15, 0, 
+  11}, {7, 18, 6, 12, 13, -14, 4, 9, 3, 13, -1, -12, 11, 
+  18}, {17, -12, 19, 1, -16, 10, 20, -15, 1, 
+  13, -15, -12, -13, -4}, {-4, -12, -9, 7, 14, 4, 6, 15, 4, 11, 
+  19, -8, 11, -20}, {0, -3, 9, -4, 0, 19, -9, 15, 20, 0, -3, 8, -13, 
+  17}, {2, 19, 15, -2, 16, -7, -11, 17, 8, -20, 17, -13, 9, 3}, {-15, 
+  13, 10, 14, -1, 19, 19, -6, 1, -3, -6, -10, -19, 
+  11}, {-13, -18, -12, -6, -5, -5, 14, -8, 5, 6, 10, 19, -15, 
+  13}, {9, -18, 6, 10, 8, -3, -18, -5, 18, 17, 16, 
+  6, -18, -12}, {-13, -15, -2, -13, 0, 20, -1, -16, 1, 3, 15, 13, 6, 
+  10}, {4, -9, 5, 11, -17, -4, -1, 10, 17, 8, 17, 1, -7, 18}, {1, -18,
+   1, -2, 7, -7, -1, 2, -20, 7, 7, -13, -16, 9}, {10, -1, 
+  16, -20, -4, -1, -17, -1, -15, 16, 1, 9, 16, 13}};
+    
+    N->matrix = {{-10, 6, 4, -16, 9, 12, 0, -2, 4, -15, 18, 10, -3, -6}, {12, 14, 
+  0, -3, 2, -17, 8, -19, 20, -14, -20, -6, 7, 17}, {7, -15, -14, 
+  13, -12, 18, 3, 6, -18, -12, -10, -6, 19, -13}, {7, 19, 12, 4, -1, 
+  5, -16, 13, 4, 12, -18, -4, 16, 8}, {-18, 8, -15, -4, 7, 0, -3, 
+  6, -14, -18, 8, 10, 14, 6}, {-11, 17, 4, -11, -5, -3, 6, -20, 4, 
+  18, -5, -16, 2, 8}, {6, 6, -9, 18, -4, 5, -9, 18, -19, 4, -5, 15, 3,
+   16}, {-11, -7, -10, 1, 12, -9, -8, -1, -20, 6, 
+  14, -13, -18, -15}, {-19, 8, -15, -8, -6, 13, -20, -17, 3, 
+  11, -4, -15, 2, -7}, {-7, -9, -5, 2, -15, 17, -19, 5, -15, -5, 11, 
+  17, 12, -15}, {16, 14, 12, -12, -13, 0, -16, -12, 20, -20, -8, 16, 
+  16, 4}, {3, 7, 13, 11, 6, -1, -17, -10, -14, -5, -14, 15, 
+  11, -12}, {4, 16, -2, -9, -6, 7, 6, 17, 13, -9, 10, -16, 
+  0, -19}, {18, -17, -12, 2, 7, -15, 9, -7, 10, 17, 14, 10, 20, 3}};
+    
+    O->matrix = {{161, -75, 489, -193, 625, -1012, 465, 281, 539, 134, 12, -279, -850,
+   743}, {14, -221, -371, 435, -298, 1035, -882, 325, -850, -113, 30, 
+  722, 1105, -620}, {285, -62, -805, -38, 56, 6, -120, 464, 119, -446,
+   439, 159, 789, -54}, {-221, -608, -278, 489, -550, 1175, 56, 
+  555, -859, 510, 91, 253, 74, 101}, {-732, 846, 23, -431, -415, 
+  536, -998, 536, -378, -436, 
+  299, -36, -223, -310}, {-579, -412, -577, -131, 
+  175, -138, -271, -1222, -402, 928, 142, -504, 247, -367}, {146, 
+  323, -604, -596, 193, -431, 352, -458, 720, -973, -76, -787, 216, 
+  15}, {461, 69, -348, 659, -245, -385, 192, -273, -144, 
+  1045, -1049, -193, 719, 1361}, {359, -451, 189, 
+  623, -120, -91, -831, -163, -482, 613, -111, 1260, 406, 165}, {-833,
+   15, 247, -398, -465, 1107, -1383, -416, -393, -414, -64, 578, 
+  585, -630}, {238, 149, 256, -152, -532, 20, -73, -552, 305, 
+  280, -72, 372, 634, -103}, {390, -357, -54, -38, -297, 
+  300, -938, -422, 177, 599, 85, 229, 540, -450}, {192, -1007, -74, 
+  185, 80, -51, 182, 568, -490, -76, 777, 943, 96, 
+  149}, {366, -870, -119, -188, -165, 237, 567, -60, -6, -821, 888, 
+  346, 393, -1238}};
+    
+    Matrix* P = multiply(M,N,2);
+    
+    assert(isEqual(O, P));
+    
+    free(M);
+    free(N);
+    free(O);
+    free(P);
+
     
     cout << "all Strassen tests pass" << endl;
 }
 
+void testfindOptDim(){
+    assert(findOptDim(258,17) == 272);
+    assert(findOptDim(513,15) == 576);
+    assert(findOptDim(1025,15) == 1152);
+
+           cout << "all findOptDim tests pass" << endl;
+}
+
+void testInitPadding(){
+    Matrix* A = new Matrix();
+    initMatrix(A,2);
+    Matrix* B = new Matrix();
+    initMatrix(B,4);
+    A->matrix = {{1,1},{1,1}};
+    B->matrix = {{1,1,0,0},{1,1,0,0},{0,0,0,0},{0,0,0,0}};
+
+    initPadding(A,4);
+    assert(isEqual(A,B));
+    cout << "all initPadding tests pass" << endl;
+}
 
 
+void testPowers2(){
+    for (int i = 2; i <=1024; i *= 2){
+        Matrix* m1 = new Matrix();
+        initMatrix(m1, i);
+        Matrix* m2 = new Matrix();
+        initMatrix(m2, i);
+        cout << "populating m1" << endl;
+        populateRandomMatrix(m1, -10, 10);
+        cout << "populating m2" << endl;
+        populateRandomMatrix(m2, -10, 10);
+        
+        cout << "multiplying matrices, n = " << i << endl;
+        
+        multiply(m1, m2, 15);
+        cout << "finished multiplying.\n" << endl;
+        free(m1);
+        free(m2);
+    }
+
+}
 int main(){
-    testStrasMult();
-	testConvMult();
+//    testStrasMult();
+//    testConvMult();
+//    testfindOptDim();
+//    testInitPadding();
+//    testRandMatrix();
+//    testPowers2();
     
-    return 0;
+        return 0;
 }
 
 
