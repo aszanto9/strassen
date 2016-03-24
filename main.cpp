@@ -112,10 +112,7 @@ void convMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, in
 void multiply(Matrix*, Matrix*, Matrix*, int , int , int , int , int , int , int , int); // forward declare for mutual recursion
 
 void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension) {
-    Matrix* T1 = new Matrix();
-    initMatrix(T1, dimension/2); // TODO deal with non-power of 2 case
-    Matrix* T2 = new Matrix();
-    initMatrix(T2, dimension/2); // TODO deal with non-power of 2 case
+    
     
     // C12 = A21 - A11
     subtract(A, A, C, topA + dimension/2, leftA, topA, leftA, topC, leftC + dimension/2, dimension/2);
@@ -133,12 +130,20 @@ void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB
     add(A, A, C, topA, leftA, topA + dimension/2, leftA + dimension/2, topC, leftC + dimension/2, dimension/2);
     //C21 = B11 + B22
     add(B,B,C,topB,leftB,topB + dimension/2,leftB + dimension/2,topC + dimension/2,leftC,dimension/2);
+    
+    Matrix* T1 = new Matrix();
+    initMatrix(T1, dimension/2); // TODO deal with non-power of 2 case
+    
+    
     //T1 = C12*C21
     multiply(C,C,T1,topC,leftC + dimension/2,topC + dimension/2,leftC,0,0,dimension/2,2);
     //C11 = T1 + C11
     add(T1,C,C,0,0,topC,leftC,topC,leftC,dimension/2);
     //C22 = T1 + C22
     add(T1,C,C,0,0,topC + dimension/2,leftC + dimension/2,topC + dimension/2,leftC + dimension/2,dimension/2);
+    
+    Matrix* T2 = new Matrix();
+    initMatrix(T2, dimension/2); // TODO deal with non-power of 2 case
     //T2 = A21 + A22
     add(A,A,T2,topA + dimension/2,leftA,topA + dimension/2,leftA + dimension/2,0,0,dimension/2);
     //C21 = T2 * B11
@@ -168,8 +173,8 @@ void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB
     //C11 = C11 - T1
     subtract(C,T1,C,topC,leftC,0,0,topC,leftC,dimension/2);
 
-    free(T1);
-    free(T2);
+    delete(T1);
+    delete(T2);
 }
 
 void multiply(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension, int threshold){
@@ -208,6 +213,38 @@ void populateRandomMatrix(Matrix* M, int low, int high){
             M->matrix[i][j] = dist(mtgen);
 }
 
+void findOptimalThreshold() {
+    for (int i = 12; i <= 64; i++){
+        
+        
+        
+        double total = 0;
+        //cout << "multiplying matrices, n = " << i << endl;
+        for (int j = 0; j < 10; j ++){
+            Matrix* m1 = new Matrix();
+            Matrix* m2 = new Matrix();
+            initMatrix(m1, 256);
+            initMatrix(m2, 256);
+            //cout << "populating m1" << endl;
+            populateRandomMatrix(m1, -10, 10);
+            //cout << "populating m2" << endl;
+            populateRandomMatrix(m2, -10, 10);
+            clock_t start;
+            start = clock();
+            
+            Matrix* m3 = multiply(m1, m2, i);
+            total += (std::clock() - start) / (double)(CLOCKS_PER_SEC);
+            delete(m1);
+            delete(m2);
+            delete(m3);
+        }
+        cout << i << "\t" << total / 10 << endl;
+        //cout << "finished multiplying.\n" << endl;
+        
+    }
+
+    
+}
 
 
 void testRandMatrix(){
@@ -446,6 +483,7 @@ int main(){
 //    testInitPadding();
 //    testRandMatrix();
 //    testPowers2();
+    findOptimalThreshold();
     
         return 0;
 }
