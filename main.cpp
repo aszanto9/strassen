@@ -178,7 +178,7 @@ void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB
 }
 
 void multiply(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension, int threshold){
-    if (dimension >= threshold)
+    if (dimension > threshold)
         strassenMult(A, B, C, topA, leftA, topB, leftB, topC, leftC, dimension);
     else
         convMult(A, B, C, topA, leftA, topB, leftB, topC, leftC, dimension);
@@ -214,21 +214,21 @@ void populateRandomMatrix(Matrix* M, int low, int high){
 }
 
 void findOptimalThreshold() {
-    for (int i = 12; i <= 64; i++){
+    for (int i = 2; i <= 2048; i*=2){
         
         
         
         double total = 0;
         //cout << "multiplying matrices, n = " << i << endl;
-        for (int j = 0; j < 10; j ++){
+        for (int j = 0; j < 1; j ++){
             Matrix* m1 = new Matrix();
             Matrix* m2 = new Matrix();
-            initMatrix(m1, 256);
-            initMatrix(m2, 256);
+            initMatrix(m1, 2048);
+            initMatrix(m2, 2048);
             //cout << "populating m1" << endl;
-            populateRandomMatrix(m1, -10, 10);
+            populateRandomMatrix(m1, 0, 1);
             //cout << "populating m2" << endl;
-            populateRandomMatrix(m2, -10, 10);
+            populateRandomMatrix(m2, 0, 1);
             clock_t start;
             start = clock();
             
