@@ -419,14 +419,35 @@ void testInitPadding(){
 }
 
 
+void testPowers2(){
+    for (int i = 2; i <=1024; i *= 2){
+        Matrix* m1 = new Matrix();
+        initMatrix(m1, i);
+        Matrix* m2 = new Matrix();
+        initMatrix(m2, i);
+        cout << "populating m1" << endl;
+        populateRandomMatrix(m1, -10, 10);
+        cout << "populating m2" << endl;
+        populateRandomMatrix(m2, -10, 10);
+        
+        cout << "multiplying matrices, n = " << i << endl;
+        
+        multiply(m1, m2, 15);
+        cout << "finished multiplying.\n" << endl;
+        free(m1);
+        free(m2);
+    }
 
+}
 int main(){
-    testStrasMult();
-	testConvMult();
-    testfindOptDim();
-    testInitPadding();
-    testRandMatrix();
-    return 0;
+//    testStrasMult();
+//    testConvMult();
+//    testfindOptDim();
+//    testInitPadding();
+//    testRandMatrix();
+//    testPowers2();
+    
+        return 0;
 }
 
 
