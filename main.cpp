@@ -482,8 +482,8 @@ int main(){
 //    testfindOptDim();
 //    testInitPadding();
 //    testRandMatrix();
-//    testPowers2();
-    findOptimalThreshold();
+    testPowers2();
+    //findOptimalThreshold();
     
         return 0;
 }
