@@ -100,8 +100,8 @@ void subtract(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, in
 }
 
 void convMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension) {
-    for (int i = 0; i < dimension; ++i)
-		for (int j = 0; j < dimension; ++j)
+    for (int j = 0; j < dimension; ++j)
+		for (int i = 0; i < dimension; ++i)
 			for (int k = 0; k < dimension; ++k)
                 if (k == 0) 
                     C->matrix[topC + i][leftC + j] = A->matrix[topA + i][leftA + k] * B->matrix[topB + k][leftB + j]; 
@@ -214,7 +214,7 @@ void populateRandomMatrix(Matrix* M, int low, int high){
 }
 
 void findOptimalThreshold() {
-    for (int i = 2; i <= 2048; i*=2){
+    for (int i = 1025; i <= 1025; i*=2){
         
         
         
@@ -223,8 +223,8 @@ void findOptimalThreshold() {
         for (int j = 0; j < 1; j ++){
             Matrix* m1 = new Matrix();
             Matrix* m2 = new Matrix();
-            initMatrix(m1, 2048);
-            initMatrix(m2, 2048);
+            initMatrix(m1, 1024);
+            initMatrix(m2, 1024);
             //cout << "populating m1" << endl;
             populateRandomMatrix(m1, 0, 1);
             //cout << "populating m2" << endl;
@@ -238,7 +238,7 @@ void findOptimalThreshold() {
             delete(m2);
             delete(m3);
         }
-        cout << i << "\t" << total / 10 << endl;
+        cout << i << "\t" << total / 1 << endl;
         //cout << "finished multiplying.\n" << endl;
         
     }
