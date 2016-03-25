@@ -587,6 +587,7 @@ void testStrasMult(){
     free(O);
     free(P);
 
+
     
     cout << "all Strassen tests pass" << endl;
 }
@@ -664,6 +665,12 @@ Matrix* FileToMatrix(char* inputfile, int dimension, int order){
 
 
 
+void printDiagonal(Matrix* M, int dimension){
+    for (int i = 0; i < dimension; ++i) {
+        cout << M->matrix[i][i] << endl;
+    }
+}
+
 
 
 
@@ -682,14 +689,23 @@ int main(int argc, char *argv[]){
         int dimension = atoi(argv[2]);
         char* inputfile = argv[3];
 
-    //    Matrix* M = FileToMatrix(inputfile, dimension, customFlag);
+    
+
+        Matrix* A = FileToMatrix(inputfile, dimension, 0);
+        Matrix* B = FileToMatrix(inputfile, dimension, 0);
+
+        Matrix* C = multiply(A,B);
+
+        printDiagonal(C, dimension);
+
+
     //    testStrasMult();
     //    testConvMult();
     //    testfindOptDim();
     //    testInitPadding();
     //    testRandMatrix();
     //    testPowers2();
-        findOptimalThreshold();
+    //    findOptimalThreshold();
     //    findOptimalThreadThresh();
     //    timeRandMult(4096);
     }
