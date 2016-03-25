@@ -346,42 +346,6 @@ void populateRandomMatrix(Matrix* M, int low, int high){
             M->matrix[i][j] = dist(mtgen);
 }
 
-void findOptimalThreshold() {
-
-    for (threshold = 8; threshold <= 256; threshold*=2){
-    //for (threshold = 2; threshold <= 64; threshold++){    
-
-        
-        
-        double total = 0;
-        //cout << "multiplying matrices, n = " << i << endl;
-        for (int j = 0; j < 5; j ++){
-            Matrix* m1 = new Matrix();
-            Matrix* m2 = new Matrix();
-            initMatrix(m1, 256);
-            initMatrix(m2, 256);
-            //cout << "populating m1" << endl;
-            populateRandomMatrix(m1, 0, 1);
-            //cout << "populating m2" << endl;
-            populateRandomMatrix(m2, 0, 1);
-            clock_t start;
-            start = clock();
-            
-            Matrix* m3 = multiply(m1, m2);
-            total += (std::clock() - start) / (double)(CLOCKS_PER_SEC);
-            delete(m1);
-            delete(m2);
-            delete(m3);
-        }
-
-        cout << threshold << "\t" << total / 5 << endl;
-
-        //cout << "finished multiplying.\n" << endl;
-        
-    }
-}
-
-
 double timeRandMult(int dimension){
             Matrix* m1 = new Matrix();
             Matrix* m2 = new Matrix();
@@ -393,16 +357,41 @@ double timeRandMult(int dimension){
             start = clock();
             
             Matrix* m3 = multiply(m1, m2);
+            double time = (std::clock() - start) / (double)(CLOCKS_PER_SEC);
             delete(m1);
             delete(m2);
             delete(m3);
-            return (std::clock() - start) / (double)(CLOCKS_PER_SEC);
+            return time;
     
 }
 
 
+
+void findOptimalThreshold() {
+
+    for (threshold = 4; threshold <= 1014; threshold*=2){
+    //for (threshold = 2; threshold <= 64; threshold++){    
+
+        
+        
+        double total = 0;
+        //cout << "multiplying matrices, n = " << i << endl;
+        for (int j = 0; j < 10; j ++){
+            total += timeRandMult(1024);
+        }
+
+        cout << threshold << "\t" << total / 10 << endl;
+
+        //cout << "finished multiplying.\n" << endl;
+        
+    }
+}
+
+
+
+
 void findOptimalThreadThresh() {
-    threshold = 16;
+    threshold = 32;
     threadThresh = 64;
     while (threadThresh != 4096){
         //cout << threadThresh << endl;;
@@ -633,26 +622,12 @@ void testInitPadding(){
 
 void testPowers2(){
     for (int i = 2; i <= 4096; i *= 2){
-        Matrix* m1 = new Matrix();
-        initMatrix(m1, i);
-        Matrix* m2 = new Matrix();
-        initMatrix(m2, i);
-        //cout << "populating m1" << endl;
-        populateRandomMatrix(m1, -10, 10);
-        //cout << "populating m2" << endl;
-        populateRandomMatrix(m2, -10, 10);
-        
-        //cout << "multiplying matrices, n = " << i << endl;
-        clock_t start;
-        start = clock();
-        Matrix* m3 = multiply(m1, m2);
-        
-
-        cout << "multiplied " << i << "x" << i << " in " << ((double) (clock() - start) / (double)(CLOCKS_PER_SEC)) << "s" << endl;
-        delete(m1);
-        delete(m2);
-        delete(m3);
-
+        double total = 0;
+        for (int j = 0; j < 10; ++j)
+        {
+            total += timeRandMult(i);
+        }
+        cout << i << "\t" <<  total / 10 << endl;
     }
 
 }
@@ -700,7 +675,7 @@ int main(int argc, char *argv[]){
     else
     {
         
-        threshold = 16;
+        threshold = 32;
         threadThresh = 512;
 
 
@@ -723,10 +698,12 @@ int main(int argc, char *argv[]){
     //    testfindOptDim();
     //    testInitPadding();
     //    testRandMatrix();
-    //    testPowers2();
-    //    findOptimalThreshold();
-    //    findOptimalThreadThresh();
     //    timeRandMult(4096);
+
+    //    testPowers2();
+        findOptimalThreshold();
+        findOptimalThreadThresh();
+    
     }
     
     return 0;
