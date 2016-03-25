@@ -16,4 +16,13 @@ Multiply(Matrix A, Matrix B) (Aron)
 
 AFTER INITIAL IMPLEMENTATION WORKS
 Cache localization
-Make both space efficient, ie do calculations in place
+Make both space efficient, ie do calculations in placee
+
+
+
+
+Still TODO:
+Input from file
+	Test input
+Function for timing a random nxn matrix
+Threashold test multiple dimensions for matrices + different threasholds
