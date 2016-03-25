@@ -14,7 +14,9 @@
 #include <algorithm>
 
 using namespace std;
-
+int threads = 0;
+int threadThresh = 0;
+int threshold = 0;
 
 struct Matrix {
     int dimension;
@@ -100,32 +102,35 @@ void subtract(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, in
 }
 
 void convMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension) {
-    for (int j = 0; j < dimension; ++j)
-		for (int i = 0; i < dimension; ++i)
-			for (int k = 0; k < dimension; ++k)
+    for (int i = 0; i < dimension; ++i)
+		for (int k = 0; k < dimension; ++k)
+			for (int j = 0; j < dimension; ++j)
                 if (k == 0) 
                     C->matrix[topC + i][leftC + j] = A->matrix[topA + i][leftA + k] * B->matrix[topB + k][leftB + j]; 
 				else
                     C->matrix[topC + i][leftC + j] += A->matrix[topA + i][leftA + k] * B->matrix[topB + k][leftB + j];
 }
 
-void multiply(Matrix*, Matrix*, Matrix*, int , int , int , int , int , int , int , int); // forward declare for mutual recursion
+void multiply(Matrix*, Matrix*, Matrix*, int , int , int , int , int , int , int); // forward declare for mutual recursion
 
 void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension) {
-    
     
     // C12 = A21 - A11
     subtract(A, A, C, topA + dimension/2, leftA, topA, leftA, topC, leftC + dimension/2, dimension/2);
     // C21 = B11 + B12
     add(B,B,C,topB,leftB,topB,leftB + dimension/2,topC + dimension/2,leftC,dimension/2);
     // C22 = C12 * C21
-    multiply(C,C,C,topC,leftC + dimension/2,topC + dimension/2,leftC,topC + dimension/2,leftC + dimension/2,dimension/2,dimension/2);
+
+    multiply(C,C,C,topC,leftC + dimension/2,topC + dimension/2,leftC,topC + dimension/2,leftC + dimension/2,dimension/2);
+
     //C12 = A12 - A22
     subtract(A,A,C,topA,leftA + dimension/2,topA + dimension/2,leftA + dimension/2,topC,leftC + dimension/2,dimension/2);
     //C21 = B21 + B22
     add(B, B, C, topB + dimension/2,leftB,topB + dimension/2,leftB + dimension/2,topC + dimension/2,leftC,dimension/2);
     //C11 = C12 * C21
-    multiply(C,C,C,topC,leftC + dimension/2,topC + dimension/2,leftC,topC,leftC,dimension/2,dimension/2);
+
+    multiply(C,C,C,topC,leftC + dimension/2,topC + dimension/2,leftC,topC,leftC,dimension/2);
+
     //C12 = A11 + A22
     add(A, A, C, topA, leftA, topA + dimension/2, leftA + dimension/2, topC, leftC + dimension/2, dimension/2);
     //C21 = B11 + B22
@@ -136,7 +141,7 @@ void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB
     
     
     //T1 = C12*C21
-    multiply(C,C,T1,topC,leftC + dimension/2,topC + dimension/2,leftC,0,0,dimension/2,dimension/2);
+    multiply(C,C,T1,topC,leftC + dimension/2,topC + dimension/2,leftC,0,0,dimension/2);
     //C11 = T1 + C11
     add(T1,C,C,0,0,topC,leftC,topC,leftC,dimension/2);
     //C22 = T1 + C22
@@ -147,13 +152,17 @@ void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB
     //T2 = A21 + A22
     add(A,A,T2,topA + dimension/2,leftA,topA + dimension/2,leftA + dimension/2,0,0,dimension/2);
     //C21 = T2 * B11
-    multiply(T2,B,C,0,0,topB,leftB,topC + dimension/2,leftC,dimension/2,dimension/2);
+
+    multiply(T2,B,C,0,0,topB,leftB,topC + dimension/2,leftC,dimension/2);
+
     //C22 = C22 - C21
     subtract(C,C,C,topC + dimension/2,leftC + dimension/2,topC + dimension/2,leftC,topC + dimension/2,leftC + dimension/2,dimension/2);
     //T1 = B21 - B11
     subtract(B,B,T1,topB + dimension/2,leftB,topB,leftB,0,0,dimension/2);
     //T2 = A22 * T1
-    multiply(A,T1,T2,topA + dimension/2,leftA + dimension/2,0,0,0,0,dimension/2,dimension/2);
+
+    multiply(A,T1,T2,topA + dimension/2,leftA + dimension/2,0,0,0,0,dimension/2);
+
     //C21 = C21 + T2
     add(C,T2,C,topC + dimension/2,leftC,0,0,topC + dimension/2,leftC,dimension/2);
     //C11 = C11 + T2
@@ -161,31 +170,155 @@ void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB
     //T1 = B12 - B22
     subtract(B,B,T1,topB,leftB + dimension/2,topB + dimension/2,leftB + dimension/2,0,0,dimension/2);
     //C12 = A11 * T1
-    multiply(A,T1,C,topA,leftA,0,0,topC,leftC + dimension/2,dimension/2,dimension/2);
+
+    multiply(A,T1,C,topA,leftA,0,0,topC,leftC + dimension/2,dimension/2);
+
     //C22 = C22 + C12
     add(C,C,C,topC + dimension/2,leftC + dimension/2,topC,leftC + dimension/2,topC + dimension/2,leftC + dimension/2,dimension/2);
     //T2 = A11 + A12
     add(A,A,T2,topA,leftA,topA,leftA + dimension/2,0,0,dimension/2);
     //T1 = T2 * B22
-    multiply(T2,B,T1,0,0,topB + dimension/2,leftB + dimension/2,0,0,dimension/2,dimension/2);
+
+    multiply(T2,B,T1,0,0,topB + dimension/2,leftB + dimension/2,0,0,dimension/2);
+
     //C12 = C12 + T1
     add(C,T1,C,topC,leftC + dimension/2,0,0,topC,leftC + dimension/2,dimension/2);
     //C11 = C11 - T1
     subtract(C,T1,C,topC,leftC,0,0,topC,leftC,dimension/2);
-
+    
     delete(T1);
     delete(T2);
 }
 
-void multiply(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension, int threshold){
-    if (dimension > threshold)
-        strassenMult(A, B, C, topA, leftA, topB, leftB, topC, leftC, dimension);
+void strassenMultThread(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension) {
+    
+    {
+    // 1. C12 = A21 - A11
+    thread t1(subtract, A, A, C, topA + dimension/2, leftA, topA, leftA, topC, leftC + dimension/2, dimension/2);
+    // 2. C21 = B11 + B12
+    add(B,B,C,topB,leftB,topB,leftB + dimension/2,topC + dimension/2,leftC,dimension/2);
+    t1.join();
+    //threads++;
+    }
+
+    // 3. C22 = C12 * C21
+    multiply(C,C,C,topC,leftC + dimension/2,topC + dimension/2,leftC,topC + dimension/2,leftC + dimension/2,dimension/2);
+    
+    {
+    // 4. C12 = A12 - A22
+    thread t2(subtract, A,A,C,topA,leftA + dimension/2,topA + dimension/2,leftA + dimension/2,topC,leftC + dimension/2,dimension/2);
+    // 5. C21 = B21 + B22
+    add(B, B, C, topB + dimension/2,leftB,topB + dimension/2,leftB + dimension/2,topC + dimension/2,leftC,dimension/2);
+    t2.join();
+    //threads++;
+    }
+
+    //6. C11 = C12 * C21
+    multiply(C,C,C,topC,leftC + dimension/2,topC + dimension/2,leftC,topC,leftC,dimension/2);
+    
+    Matrix* T2 = new Matrix();
+    initMatrix(T2, dimension/2); // TODO deal with non-power of 2 case
+    {
+        
+    // 7. C12 = A11 + A22
+    thread t3(add,A, A, C, topA, leftA, topA + dimension/2, leftA + dimension/2, topC, leftC + dimension/2, dimension/2);
+    //8. C21 = B11 + B22
+    thread t4(add,B,B,C,topB,leftB,topB + dimension/2,leftB + dimension/2,topC + dimension/2,leftC,dimension/2);
+    //12. T2 = A21 + A22
+    add(A,A,T2,topA + dimension/2,leftA,topA + dimension/2,leftA + dimension/2,0,0,dimension/2);
+    t3.join();
+    t4.join();
+    //threads++;
+    //threads++;
+    }
+    
+
+    Matrix* T1 = new Matrix();
+    initMatrix(T1, dimension/2); // TODO deal with non-power of 2 case
+    //9. T1 = C12*C21
+    multiply(C,C,T1,topC,leftC + dimension/2,topC + dimension/2,leftC,0,0,dimension/2);
+    
+    {
+    //10. C11 = T1 + C11
+    thread t5(add,T1,C,C,0,0,topC,leftC,topC,leftC,dimension/2);
+    //11. C22 = T1 + C22
+    thread t6(add,T1,C,C,0,0,topC + dimension/2,leftC + dimension/2,topC + dimension/2,leftC + dimension/2,dimension/2);
+    //13. C21 = T2 * B11
+    multiply(T2,B,C,0,0,topB,leftB,topC + dimension/2,leftC,dimension/2);
+    t5.join();
+    t6.join();
+    //threads++;
+    //threads++;
+    }
+
+    {
+    //14. C22 = C22 - C21
+    thread t7(subtract,C,C,C,topC + dimension/2,leftC + dimension/2,topC + dimension/2,leftC,topC + dimension/2,leftC + dimension/2,dimension/2);
+    //15. T1 = B21 - B11
+    subtract(B,B,T1,topB + dimension/2,leftB,topB,leftB,0,0,dimension/2);
+    t7.join();
+    //threads++;
+    }
+
+    //16. T2 = A22 * T1
+    multiply(A,T1,T2,topA + dimension/2,leftA + dimension/2,0,0,0,0,dimension/2);
+    
+    {
+    //17. C21 = C21 + T2
+    thread t8(add,C,T2,C,topC + dimension/2,leftC,0,0,topC + dimension/2,leftC,dimension/2);
+    //18. C11 = C11 + T2
+    thread t9(add,C,T2,C,topC,leftC,0,0,topC,leftC,dimension/2);
+    //19. T1 = B12 - B22
+    subtract(B,B,T1,topB,leftB + dimension/2,topB + dimension/2,leftB + dimension/2,0,0,dimension/2);
+    t8.join();
+    t9.join();
+    }
+    //threads++;
+    //threads++;
+    
+    //20. C12 = A11 * T1
+    multiply(A,T1,C,topA,leftA,0,0,topC,leftC + dimension/2,dimension/2);
+    
+    {
+    //21. C22 = C22 + C12
+    thread t10(add,C,C,C,topC + dimension/2,leftC + dimension/2,topC,leftC + dimension/2,topC + dimension/2,leftC + dimension/2,dimension/2);
+    //22. T2 = A11 + A12
+    add(A,A,T2,topA,leftA,topA,leftA + dimension/2,0,0,dimension/2);
+    t10.join();
+    //threads++;
+    }
+
+    //23. T1 = T2 * B22
+    multiply(T2,B,T1,0,0,topB + dimension/2,leftB + dimension/2,0,0,dimension/2);
+    {
+    //24. C12 = C12 + T1
+    thread t11(add,C,T1,C,topC,leftC + dimension/2,0,0,topC,leftC + dimension/2,dimension/2);
+    //25. C11 = C11 - T1
+    subtract(C,T1,C,topC,leftC,0,0,topC,leftC,dimension/2);
+    t11.join();
+    }
+    
+    //threads++;
+    
+    
+    delete(T1);
+    delete(T2);
+}
+
+void multiply(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension){
+    if (dimension > threshold) {
+        if (dimension > threadThresh)
+            strassenMultThread(A, B, C, topA, leftA, topB, leftB, topC, leftC, dimension);
+        else
+            strassenMult(A, B, C, topA, leftA, topB, leftB, topC, leftC, dimension);
+        
+    }
     else
         convMult(A, B, C, topA, leftA, topB, leftB, topC, leftC, dimension);
 }
 
 // final multiplication method- returns null if A and B are not of the same dimension
-Matrix* multiply(Matrix* A, Matrix* B, int threshold){
+Matrix* multiply(Matrix* A, Matrix* B){
     if (A->dimension != B->dimension)
         return NULL;
     int dimension = A->dimension;
@@ -196,7 +329,7 @@ Matrix* multiply(Matrix* A, Matrix* B, int threshold){
     initPadding(A, padding);
     initPadding(B, padding);
     initPadding(C, padding);
-    multiply(A,B,C,0,0,0,0,0,0,padding,threshold);
+    multiply(A,B,C,0,0,0,0,0,0,padding);
     
     removePadding(A, dimension);
     removePadding(B, dimension);
@@ -214,7 +347,9 @@ void populateRandomMatrix(Matrix* M, int low, int high){
 }
 
 void findOptimalThreshold() {
-    for (int i = 2; i <= 1024; i*=2){
+
+    for (threshold = 2; threshold <= 512; threshold*=2){
+
         
         
         
@@ -223,8 +358,8 @@ void findOptimalThreshold() {
         for (int j = 0; j < 5; j ++){
             Matrix* m1 = new Matrix();
             Matrix* m2 = new Matrix();
-            initMatrix(m1, 1024);
-            initMatrix(m2, 1024);
+            initMatrix(m1, 512);
+            initMatrix(m2, 512);
             //cout << "populating m1" << endl;
             populateRandomMatrix(m1, 0, 1);
             //cout << "populating m2" << endl;
@@ -232,20 +367,52 @@ void findOptimalThreshold() {
             clock_t start;
             start = clock();
             
-            Matrix* m3 = multiply(m1, m2, i);
+            Matrix* m3 = multiply(m1, m2);
             total += (std::clock() - start) / (double)(CLOCKS_PER_SEC);
             delete(m1);
             delete(m2);
             delete(m3);
         }
-        cout << i << "\t" << total / 5 << endl;
+
+        cout << threshold << "\t" << total / 5 << endl;
+
         //cout << "finished multiplying.\n" << endl;
         
     }
-
-    
 }
 
+void findOptimalThreadThresh() {
+    threshold = 16;
+    threadThresh = 64;
+    while (threadThresh != 4096){
+        //cout << threadThresh << endl;;
+        
+        
+        double total = 0;
+        //cout << "multiplying matrices, n = " << i << endl;
+        for (int j = 0; j < 1; j ++){
+            Matrix* m1 = new Matrix();
+            Matrix* m2 = new Matrix();
+            initMatrix(m1, 2048);
+            initMatrix(m2, 2048);
+            //cout << "populating m1" << endl;
+            populateRandomMatrix(m1, 0, 1);
+            //cout << "populating m2" << endl;
+            populateRandomMatrix(m2, 0, 1);
+            clock_t start;
+            start = clock();
+            
+            Matrix* m3 = multiply(m1, m2);
+            total += (std::clock() - start) / (double)(CLOCKS_PER_SEC);
+            delete(m1);
+            delete(m2);
+            delete(m3);
+        }
+        cout << threadThresh << "\t" << total / 1 << endl;
+        //cout << "finished multiplying.\n" << endl;
+        threadThresh *= 2;
+    }
+}
 
 void testRandMatrix(){
     Matrix* m = new Matrix();
@@ -287,6 +454,7 @@ void testConvMult(){
 }
 
 void testStrasMult(){
+    threshold = 2;
     //First test
     Matrix* A = new Matrix();
     initMatrix(A,2);
@@ -301,7 +469,7 @@ void testStrasMult(){
     B->matrix = {{2,1},{3,1}};
     C->matrix = {{8,3},{9,4}};
     
-    multiply(A, B, D, 0, 0, 0, 0, 0, 0, 2, 2);
+    multiply(A, B, D, 0, 0, 0, 0, 0, 0, 2);
     assert(isEqual(D, C));
     free(A);
     free(B);
@@ -333,7 +501,7 @@ void testStrasMult(){
                     1076, 588, 639, 1198, 718}, {830, 712, 613, 679, 488, 593, 852,
                         711}};
     
-    multiply(E,F,H,0,0,0,0,0,0,8,2);
+    multiply(E,F,H,0,0,0,0,0,0,8);
     assert(isEqual(H,G));
     free(E);
     free(F);
@@ -355,7 +523,7 @@ void testStrasMult(){
     K->matrix = {{214, 242, 388, 443}, {367, 379, 426, 447}, {532, 419, 615,
         572}, {488, 480, 448, 466}};
     
-    multiply(I,J,L,0,0,0,0,0,0,4,2);
+    multiply(I,J,L,0,0,0,0,0,0,4);
     
     assert(isEqual(K, L));
     free(I);
@@ -421,7 +589,7 @@ void testStrasMult(){
   149}, {366, -870, -119, -188, -165, 237, 567, -60, -6, -821, 888, 
   346, 393, -1238}};
     
-    Matrix* P = multiply(M,N,2);
+    Matrix* P = multiply(M,N);
     
     assert(isEqual(O, P));
     
@@ -457,33 +625,43 @@ void testInitPadding(){
 
 
 void testPowers2(){
-    for (int i = 2; i <=1024; i *= 2){
+    for (int i = 2; i <= 4096; i *= 2){
         Matrix* m1 = new Matrix();
         initMatrix(m1, i);
         Matrix* m2 = new Matrix();
         initMatrix(m2, i);
-        cout << "populating m1" << endl;
+        //cout << "populating m1" << endl;
         populateRandomMatrix(m1, -10, 10);
-        cout << "populating m2" << endl;
+        //cout << "populating m2" << endl;
         populateRandomMatrix(m2, -10, 10);
         
-        cout << "multiplying matrices, n = " << i << endl;
+        //cout << "multiplying matrices, n = " << i << endl;
+        clock_t start;
+        start = clock();
+        Matrix* m3 = multiply(m1, m2);
         
-        multiply(m1, m2, 16);
-        cout << "finished multiplying.\n" << endl;
-        free(m1);
-        free(m2);
+
+        cout << "multiplied " << i << "x" << i << " in " << ((double) (clock() - start) / (double)(CLOCKS_PER_SEC)) << "s" << endl;
+        delete(m1);
+        delete(m2);
+        delete(m3);
+
     }
 
 }
 int main(){
-//    testStrasMult();
+    threshold = 16;
+    threadThresh = 512;
+    //testStrasMult();
 //    testConvMult();
 //    testfindOptDim();
 //    testInitPadding();
 //    testRandMatrix();
-    //testPowers2();
-    findOptimalThreshold();
+
+    testPowers2();
+   // findOptimalThreshold();
+    //findOptimalThreadThresh();
+
     
         return 0;
 }
