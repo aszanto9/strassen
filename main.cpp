@@ -120,13 +120,17 @@ void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB
     // C21 = B11 + B12
     add(B,B,C,topB,leftB,topB,leftB + dimension/2,topC + dimension/2,leftC,dimension/2);
     // C22 = C12 * C21
+
     multiply(C,C,C,topC,leftC + dimension/2,topC + dimension/2,leftC,topC + dimension/2,leftC + dimension/2,dimension/2);
+
     //C12 = A12 - A22
     subtract(A,A,C,topA,leftA + dimension/2,topA + dimension/2,leftA + dimension/2,topC,leftC + dimension/2,dimension/2);
     //C21 = B21 + B22
     add(B, B, C, topB + dimension/2,leftB,topB + dimension/2,leftB + dimension/2,topC + dimension/2,leftC,dimension/2);
     //C11 = C12 * C21
+
     multiply(C,C,C,topC,leftC + dimension/2,topC + dimension/2,leftC,topC,leftC,dimension/2);
+
     //C12 = A11 + A22
     add(A, A, C, topA, leftA, topA + dimension/2, leftA + dimension/2, topC, leftC + dimension/2, dimension/2);
     //C21 = B11 + B22
@@ -148,13 +152,17 @@ void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB
     //T2 = A21 + A22
     add(A,A,T2,topA + dimension/2,leftA,topA + dimension/2,leftA + dimension/2,0,0,dimension/2);
     //C21 = T2 * B11
+
     multiply(T2,B,C,0,0,topB,leftB,topC + dimension/2,leftC,dimension/2);
+
     //C22 = C22 - C21
     subtract(C,C,C,topC + dimension/2,leftC + dimension/2,topC + dimension/2,leftC,topC + dimension/2,leftC + dimension/2,dimension/2);
     //T1 = B21 - B11
     subtract(B,B,T1,topB + dimension/2,leftB,topB,leftB,0,0,dimension/2);
     //T2 = A22 * T1
+
     multiply(A,T1,T2,topA + dimension/2,leftA + dimension/2,0,0,0,0,dimension/2);
+
     //C21 = C21 + T2
     add(C,T2,C,topC + dimension/2,leftC,0,0,topC + dimension/2,leftC,dimension/2);
     //C11 = C11 + T2
@@ -162,13 +170,17 @@ void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB
     //T1 = B12 - B22
     subtract(B,B,T1,topB,leftB + dimension/2,topB + dimension/2,leftB + dimension/2,0,0,dimension/2);
     //C12 = A11 * T1
+
     multiply(A,T1,C,topA,leftA,0,0,topC,leftC + dimension/2,dimension/2);
+
     //C22 = C22 + C12
     add(C,C,C,topC + dimension/2,leftC + dimension/2,topC,leftC + dimension/2,topC + dimension/2,leftC + dimension/2,dimension/2);
     //T2 = A11 + A12
     add(A,A,T2,topA,leftA,topA,leftA + dimension/2,0,0,dimension/2);
     //T1 = T2 * B22
+
     multiply(T2,B,T1,0,0,topB + dimension/2,leftB + dimension/2,0,0,dimension/2);
+
     //C12 = C12 + T1
     add(C,T1,C,topC,leftC + dimension/2,0,0,topC,leftC + dimension/2,dimension/2);
     //C11 = C11 - T1
@@ -335,7 +347,9 @@ void populateRandomMatrix(Matrix* M, int low, int high){
 }
 
 void findOptimalThreshold() {
+
     for (threshold = 2; threshold <= 512; threshold*=2){
+
         
         
         
@@ -359,7 +373,9 @@ void findOptimalThreshold() {
             delete(m2);
             delete(m3);
         }
+
         cout << threshold << "\t" << total / 5 << endl;
+
         //cout << "finished multiplying.\n" << endl;
         
     }
@@ -624,10 +640,12 @@ void testPowers2(){
         start = clock();
         Matrix* m3 = multiply(m1, m2);
         
+
         cout << "multiplied " << i << "x" << i << " in " << ((double) (clock() - start) / (double)(CLOCKS_PER_SEC)) << "s" << endl;
         delete(m1);
         delete(m2);
         delete(m3);
+
     }
 
 }
@@ -639,9 +657,11 @@ int main(){
 //    testfindOptDim();
 //    testInitPadding();
 //    testRandMatrix();
+
     testPowers2();
    // findOptimalThreshold();
     //findOptimalThreadThresh();
+
     
         return 0;
 }
