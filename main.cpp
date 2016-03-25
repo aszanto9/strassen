@@ -102,9 +102,9 @@ void subtract(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, in
 }
 
 void convMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension) {
-    for (int j = 0; j < dimension; ++j)
-		for (int i = 0; i < dimension; ++i)
-			for (int k = 0; k < dimension; ++k)
+    for (int i = 0; i < dimension; ++i)
+		for (int k = 0; k < dimension; ++k)
+			for (int j = 0; j < dimension; ++j)
                 if (k == 0) 
                     C->matrix[topC + i][leftC + j] = A->matrix[topA + i][leftA + k] * B->matrix[topB + k][leftB + j]; 
 				else
@@ -367,17 +367,18 @@ void findOptimalThreshold() {
 
 void findOptimalThreadThresh() {
     threshold = 16;
-    for (int threadThresh = 2; threadThresh <= 512; threadThresh*=2){
-        
+    threadThresh = 64;
+    while (threadThresh != 4096){
+        //cout << threadThresh << endl;;
         
         
         double total = 0;
         //cout << "multiplying matrices, n = " << i << endl;
-        for (int j = 0; j < 5; j ++){
+        for (int j = 0; j < 1; j ++){
             Matrix* m1 = new Matrix();
             Matrix* m2 = new Matrix();
-            initMatrix(m1, 512);
-            initMatrix(m2, 512);
+            initMatrix(m1, 2048);
+            initMatrix(m2, 2048);
             //cout << "populating m1" << endl;
             populateRandomMatrix(m1, 0, 1);
             //cout << "populating m2" << endl;
@@ -391,9 +392,9 @@ void findOptimalThreadThresh() {
             delete(m2);
             delete(m3);
         }
-        cout << threadThresh << "\t" << total / 5 << endl;
+        cout << threadThresh << "\t" << total / 1 << endl;
         //cout << "finished multiplying.\n" << endl;
-        
+        threadThresh *= 2;
     }
 }
 
@@ -608,34 +609,39 @@ void testInitPadding(){
 
 
 void testPowers2(){
-    for (int i = 256; i <= 256; i *= 2){
+    for (int i = 2; i <= 4096; i *= 2){
         Matrix* m1 = new Matrix();
         initMatrix(m1, i);
         Matrix* m2 = new Matrix();
         initMatrix(m2, i);
-        cout << "populating m1" << endl;
+        //cout << "populating m1" << endl;
         populateRandomMatrix(m1, -10, 10);
-        cout << "populating m2" << endl;
+        //cout << "populating m2" << endl;
         populateRandomMatrix(m2, -10, 10);
         
-        cout << "multiplying matrices, n = " << i << endl;
+        //cout << "multiplying matrices, n = " << i << endl;
+        clock_t start;
+        start = clock();
+        Matrix* m3 = multiply(m1, m2);
         
-        multiply(m1, m2);
-        cout << "finished multiplying.\n" << endl;
-        free(m1);
-        free(m2);
+        cout << "multiplied " << i << "x" << i << " in " << ((double) (clock() - start) / (double)(CLOCKS_PER_SEC)) << "s" << endl;
+        delete(m1);
+        delete(m2);
+        delete(m3);
     }
 
 }
 int main(){
+    threshold = 16;
+    threadThresh = 512;
     //testStrasMult();
 //    testConvMult();
 //    testfindOptDim();
 //    testInitPadding();
 //    testRandMatrix();
-   // testPowers2();
-    //findOptimalThreshold();
-    findOptimalThreadThresh();
+    testPowers2();
+   // findOptimalThreshold();
+    //findOptimalThreadThresh();
     
         return 0;
 }
