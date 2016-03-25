@@ -335,8 +335,8 @@ void populateRandomMatrix(Matrix* M, int low, int high){
 }
 
 void findOptimalThreshold() {
-    for (threshold = 2; threshold <= 512; threshold*=2){
-        
+    for (threshold = 8; threshold <= 256; threshold*=2){
+    //for (threshold = 2; threshold <= 64; threshold++){    
         
         
         double total = 0;
@@ -344,8 +344,8 @@ void findOptimalThreshold() {
         for (int j = 0; j < 5; j ++){
             Matrix* m1 = new Matrix();
             Matrix* m2 = new Matrix();
-            initMatrix(m1, 512);
-            initMatrix(m2, 512);
+            initMatrix(m1, 256);
+            initMatrix(m2, 256);
             //cout << "populating m1" << endl;
             populateRandomMatrix(m1, 0, 1);
             //cout << "populating m2" << endl;
@@ -365,6 +365,25 @@ void findOptimalThreshold() {
     }
 }
 
+
+double timeRandMult(int dimension){
+            Matrix* m1 = new Matrix();
+            Matrix* m2 = new Matrix();
+            initMatrix(m1, dimension);
+            initMatrix(m2, dimension);
+            populateRandomMatrix(m1, 0, 1);
+            populateRandomMatrix(m2, 0, 1);
+            clock_t start;
+            start = clock();
+            
+            Matrix* m3 = multiply(m1, m2);
+            return (std::clock() - start) / (double)(CLOCKS_PER_SEC);
+            delete(m1);
+            delete(m2);
+            delete(m3);
+}
+
+
 void findOptimalThreadThresh() {
     threshold = 16;
     threadThresh = 64;
@@ -375,28 +394,14 @@ void findOptimalThreadThresh() {
         double total = 0;
         //cout << "multiplying matrices, n = " << i << endl;
         for (int j = 0; j < 1; j ++){
-            Matrix* m1 = new Matrix();
-            Matrix* m2 = new Matrix();
-            initMatrix(m1, 2048);
-            initMatrix(m2, 2048);
-            //cout << "populating m1" << endl;
-            populateRandomMatrix(m1, 0, 1);
-            //cout << "populating m2" << endl;
-            populateRandomMatrix(m2, 0, 1);
-            clock_t start;
-            start = clock();
-            
-            Matrix* m3 = multiply(m1, m2);
-            total += (std::clock() - start) / (double)(CLOCKS_PER_SEC);
-            delete(m1);
-            delete(m2);
-            delete(m3);
+            total += timeRandMult(2048);
         }
         cout << threadThresh << "\t" << total / 1 << endl;
         //cout << "finished multiplying.\n" << endl;
         threadThresh *= 2;
     }
 }
+
 
 void testRandMatrix(){
     Matrix* m = new Matrix();
@@ -631,19 +636,65 @@ void testPowers2(){
     }
 
 }
-int main(){
-    threshold = 16;
-    threadThresh = 512;
-    //testStrasMult();
-//    testConvMult();
-//    testfindOptDim();
-//    testInitPadding();
-//    testRandMatrix();
-    testPowers2();
-   // findOptimalThreshold();
-    //findOptimalThreadThresh();
+
+
+
+Matrix* FileToMatrix(char* inputfile, int dimension, int order){
+    Matrix* M = new Matrix();
+    initMatrix(M, dimension);
+
+    ifstream inFile(inputfile);
+    string line;
+    for (int i = 0; i < pow(dimension,2)*order; ++i)
+    {
+        getline(inFile, line);
+    }
+
+    for (int i = 0; i < dimension; ++i)
+    {
+        for (int j = 0; j < dimension; ++j)
+        {
+            getline(inFile, line);
+            M->matrix[i][j] = stoi(line);
+        }
+    }
+    inFile.close();
+    return M;
+}
+
+
+
+
+
+
+
+int main(int argc, char *argv[]){
+    if (argc != 4)
+        std::cout<<"Incorrect numargs, proper: \'0 dimension inputfile\'";
+    else
+    {
+        
+        threshold = 16;
+        threadThresh = 512;
+
+
+        int customFlag = atoi(argv[1]);
+        int dimension = atoi(argv[2]);
+        char* inputfile = argv[3];
+
+    //    Matrix* M = FileToMatrix(inputfile, dimension, customFlag);
+    //    testStrasMult();
+    //    testConvMult();
+    //    testfindOptDim();
+    //    testInitPadding();
+    //    testRandMatrix();
+    //    testPowers2();
+        findOptimalThreshold();
+    //    findOptimalThreadThresh();
+    //    timeRandMult(4096);
+    }
     
-        return 0;
+    return 0;
 }
 
 
