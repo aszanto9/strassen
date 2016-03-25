@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.1.31)  25 MAR 2016 13:51
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.1.31)  25 MAR 2016 14:32
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -253,74 +253,77 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 25.
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<totaltime.PNG, id=1, 608.2725pt x 384.6872pt>
-File: totaltime.PNG Graphic file (type png)
- <use totaltime.PNG>
-Package pdftex.def Info: totaltime.PNG used on input line 31.
-(pdftex.def)             Requested size: 486.61867pt x 307.75017pt.
+<totaltime.png, id=1, 817.0525pt x 509.905pt>
+File: totaltime.png Graphic file (type png)
+ <use totaltime.png>
+Package pdftex.def Info: totaltime.png used on input line 31.
+(pdftex.def)             Requested size: 531.07785pt x 331.43431pt.
 
-<paddingsize.PNG, id=3, 823.57687pt x 396.7322pt>
-File: paddingsize.PNG Graphic file (type png)
- <use paddingsize.PNG>
-Package pdftex.def Info: paddingsize.PNG used on input line 36.
-(pdftex.def)             Requested size: 535.31862pt x 257.87286pt.
+Overfull \hbox (25.18785pt too wide) in paragraph at lines 31--32
+ [] 
+ []
 
-Overfull \hbox (29.42862pt too wide) in paragraph at lines 36--37
+<padsize.png, id=2, 939.51pt x 441.65pt>
+File: padsize.png Graphic file (type png)
+ <use padsize.png>
+Package pdftex.def Info: padsize.png used on input line 36.
+(pdftex.def)             Requested size: 516.7321pt x 242.90823pt.
+
+Overfull \hbox (10.8421pt too wide) in paragraph at lines 36--37
  [] 
  []
 
 [1
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./totaltime.PNG>]
-<padddingration.PNG, id=14, 980.16188pt x 330.48468pt>
-File: padddingration.PNG Graphic file (type png)
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./totaltime.png>]
+<padratio.png, id=12, 1201.48875pt x 405.515pt>
+File: padratio.png Graphic file (type png)
+ <use padratio.png>
+Package pdftex.def Info: padratio.png used on input line 41.
+(pdftex.def)             Requested size: 540.66495pt x 182.48006pt.
 
-<use padddingration.PNG>
-Package pdftex.def Info: padddingration.PNG used on input line 41.
-(pdftex.def)             Requested size: 588.10167pt x 198.29233pt.
-
-Overfull \hbox (82.21167pt too wide) in paragraph at lines 41--42
+Overfull \hbox (34.77495pt too wide) in paragraph at lines 41--42
  [] 
  []
 
-<threshold512.PNG, id=15, 514.17094pt x 341.77687pt>
-File: threshold512.PNG Graphic file (type png)
- <use threshold512.PNG>
-Package pdftex.def Info: threshold512.PNG used on input line 46.
-(pdftex.def)             Requested size: 462.74957pt x 307.59633pt.
+<threshold512.png, id=13, 679.53876pt x 439.6425pt>
+File: threshold512.png Graphic file (type png)
+ <use threshold512.png>
+Package pdftex.def Info: threshold512.png used on input line 46.
+(pdftex.def)             Requested size: 475.67389pt x 307.74765pt.
 
-[2 <./paddingsize.PNG> <./padddingration.PNG>]
-<threshold1024.PNG, id=21, 508.90125pt x 344.78813pt>
-File: threshold1024.PNG Graphic file (type png)
- <use threshold1024.PNG>
-Package pdftex.def Info: threshold1024.PNG used on input line 51.
-(pdftex.def)             Requested size: 458.0069pt x 310.30644pt.
+[2 <./padsize.png> <./padratio.png>]
+<threshold1024.png, id=17, 674.52pt x 434.62375pt>
+File: threshold1024.png Graphic file (type png)
+ <use threshold1024.png>
+Package pdftex.def Info: threshold1024.png used on input line 51.
+(pdftex.def)             Requested size: 472.16078pt x 304.23454pt.
 
-<threadthreashold.PNG, id=22, 718.18312pt x 430.60875pt>
-File: threadthreashold.PNG Graphic file (type png)
+<threadthreshold.png, id=18, 962.59625pt x 548.0475pt>
+File: threadthreshold.png Graphic file (type png)
 
-<use threadthreashold.PNG>
-Package pdftex.def Info: threadthreashold.PNG used on input line 56.
-(pdftex.def)             Requested size: 502.72476pt x 301.42406pt.
- [3 <./threshold512.PNG> <./threshold1024.PNG>]
-[4 <./threadthreashold.PNG>] (./writeup.aux) ) 
+<use threadthreshold.png>
+Package pdftex.def Info: threadthreshold.png used on input line 56.
+(pdftex.def)             Requested size: 481.29695pt x 274.02307pt.
+ [3 <./threshold512.png> <./threshold1024.png>]
+[4 <./threadthreshold.png>] (./writeup.aux) ) 
 Here is how much of TeX's memory you used:
- 2795 strings out of 493085
- 36444 string characters out of 6136917
+ 2789 strings out of 493085
+ 36362 string characters out of 6136917
  96444 words of memory out of 5000000
  6225 multiletter control sequences out of 15000+600000
  9489 words of font info for 36 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  37i,6n,26p,233b,203s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fo
-nts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/ty
-pe1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/pub
-lic/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/ams
-fonts/cm/cmr17.pfb>
-Output written on writeup.pdf (4 pages, 139135 bytes).
+</usr/share/texlive/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsf
+onts/cm/cmr17.pfb>
+Output written on writeup.pdf (4 pages, 189879 bytes).
 PDF statistics:
- 46 PDF objects out of 1000 (max. 8388607)
- 23 compressed objects within 1 object stream
+ 39 PDF objects out of 1000 (max. 8388607)
+ 22 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  31 words of extra memory for PDF output out of 10000 (max. 10000000)
 
