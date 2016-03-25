@@ -16,13 +16,14 @@
 using namespace std;
 int threads = 0;
 int threadThresh = 0;
-int threshold = 0;
+int convThreshold = 0;
 
+// typedef for matrix object
 struct Matrix {
     int dimension;
     vector<vector<int>> matrix;
 };
-
+// initialize matrix to dimension x dimension, fill with zeros
 void initMatrix(Matrix* M, int dimension){
     M->dimension = dimension;
     M->matrix.resize(dimension);
@@ -31,6 +32,7 @@ void initMatrix(Matrix* M, int dimension){
     }
 }
 
+// print matrix by rows to standard output
 void printMatrix(Matrix& A){
     for (int i = 0; i < A.dimension; i ++){
         for (int j = 0; j < A.dimension; j++){
@@ -41,7 +43,7 @@ void printMatrix(Matrix& A){
     cout << endl;
 }
 
-
+// returns true if A.dimension == B.dimension and A.matrix == B.matrix
 bool isEqual(Matrix* A, Matrix* B){
     if (A->dimension != B->dimension) {
         return false;
@@ -59,9 +61,12 @@ bool isEqual(Matrix* A, Matrix* B){
     }
 }
 
-int findOptDim(int n, int threshold){
+// find the optimal number of zero rows to pad given the number of rows in the matrix.
+// Instad of padding to the next power of 2, pad to the least z = m * 2^k
+// such that m < threshold; k is an integer
+int findOptDim(int n, int convThreshold){
     int counter = 0;
-    while (n > threshold){
+    while (n > convThreshold){
         if (n%2 == 0)
             n /= 2;
         else
@@ -71,6 +76,9 @@ int findOptDim(int n, int threshold){
     return n*pow(2,counter);
 }
 
+/*
+ * Helper functions to pad and unpad matrices
+ */
 void initPadding(Matrix* M, int newdim){
     M->dimension = newdim;
 
@@ -89,18 +97,22 @@ void removePadding(Matrix* M, int newdim){
     }
 }
 
+// add two matrices given an offset for A, B, and C for quasi-in-place Strassen
 void add(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension){
     for (int i = 0; i < dimension; i++)
         for (int j = 0; j < dimension; j++)
             C->matrix[topC + i][leftC + j] = A->matrix[topA + i][leftA + j] + B->matrix[topB + i][leftB + j];
 }
 
+// subtract two matrices given an offset for A, B, and C for quasi-in-place Strassen
 void subtract(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension){
     for (int i = 0; i < dimension; i++)
         for (int j = 0; j < dimension; j++)
             C->matrix[topC + i][leftC + j] = A->matrix[topA + i][leftA + j] - B->matrix[topB + i][leftB + j];
 }
 
+// multiply two matrices given an offset for A, B, and C using the conventional algorithm with
+// cache efficiency optimization
 void convMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension) {
     for (int i = 0; i < dimension; ++i)
 		for (int k = 0; k < dimension; ++k)
@@ -113,6 +125,7 @@ void convMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, in
 
 void multiply(Matrix*, Matrix*, Matrix*, int , int , int , int , int , int , int); // forward declare for mutual recursion
 
+// implement Strassen's algorithm in place, using scheduling inspired by Li, Ranka, and Sahni (2011)
 void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension) {
     
     // C12 = A21 - A11
@@ -190,6 +203,7 @@ void strassenMult(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB
     delete(T2);
 }
 
+// multithreaded version of Strassen's algorithm
 void strassenMultThread(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension) {
     
     {
@@ -305,8 +319,10 @@ void strassenMultThread(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, in
     delete(T2);
 }
 
+// MASTER multiplication mathod- decides between concurrent Strassen, sequential Strassen, and conventional multiplication
+// given threading and switchover thresholds
 void multiply(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, int leftB, int topC, int leftC, int dimension){
-    if (dimension > threshold) {
+    if (dimension > convThreshold) {
         if (dimension > threadThresh)
             strassenMultThread(A, B, C, topA, leftA, topB, leftB, topC, leftC, dimension);
         else
@@ -317,7 +333,7 @@ void multiply(Matrix* A, Matrix* B, Matrix* C, int topA, int leftA, int topB, in
         convMult(A, B, C, topA, leftA, topB, leftB, topC, leftC, dimension);
 }
 
-// final multiplication method- returns null if A and B are not of the same dimension
+// final multiplication wrapper, implementing padding- returns null if A and B are not of the same dimension
 Matrix* multiply(Matrix* A, Matrix* B){
     if (A->dimension != B->dimension)
         return NULL;
@@ -325,7 +341,7 @@ Matrix* multiply(Matrix* A, Matrix* B){
     Matrix* C = new Matrix();
     initMatrix(C, A->dimension);
     
-    int padding = findOptDim(dimension, threshold);
+    int padding = findOptDim(dimension, convThreshold);
     initPadding(A, padding);
     initPadding(B, padding);
     initPadding(C, padding);
@@ -337,6 +353,7 @@ Matrix* multiply(Matrix* A, Matrix* B){
     return C;
 }
 
+// populates M with random ints in [low,high]
 void populateRandomMatrix(Matrix* M, int low, int high){
     random_device r;
     mt19937 mtgen(r());
@@ -346,6 +363,43 @@ void populateRandomMatrix(Matrix* M, int low, int high){
             M->matrix[i][j] = dist(mtgen);
 }
 
+// method for finding and testing optimal n0, place at which to convert to conventional algorithm
+void findOptimalconvThreshold() {
+
+    for (convThreshold = 8; convThreshold <= 256; convThreshold*=2){
+    //for (convThreshold = 2; convThreshold <= 64; convThreshold++){    
+
+        
+        
+        double total = 0;
+        //cout << "multiplying matrices, n = " << i << endl;
+        for (int j = 0; j < 5; j ++){
+            Matrix* m1 = new Matrix();
+            Matrix* m2 = new Matrix();
+            initMatrix(m1, 256);
+            initMatrix(m2, 256);
+            //cout << "populating m1" << endl;
+            populateRandomMatrix(m1, 0, 1);
+            //cout << "populating m2" << endl;
+            populateRandomMatrix(m2, 0, 1);
+            clock_t start;
+            start = clock();
+            
+            Matrix* m3 = multiply(m1, m2);
+            total += (std::clock() - start) / (double)(CLOCKS_PER_SEC);
+            delete(m1);
+            delete(m2);
+            delete(m3);
+        }
+
+        cout << convThreshold << "\t" << total / 5 << endl;
+
+        //cout << "finished multiplying.\n" << endl;
+        
+    }
+}
+
+// gets time to multiply a random nxn (1-0) matrix
 double timeRandMult(int dimension){
             Matrix* m1 = new Matrix();
             Matrix* m2 = new Matrix();
@@ -355,43 +409,17 @@ double timeRandMult(int dimension){
             populateRandomMatrix(m2, 0, 1);
             clock_t start;
             start = clock();
-            
             Matrix* m3 = multiply(m1, m2);
-            double time = (std::clock() - start) / (double)(CLOCKS_PER_SEC);
             delete(m1);
             delete(m2);
             delete(m3);
-            return time;
+            return (std::clock() - start) / (double)(CLOCKS_PER_SEC);
     
 }
 
-
-
-void findOptimalThreshold() {
-
-    for (threshold = 4; threshold <= 1014; threshold*=2){
-    //for (threshold = 2; threshold <= 64; threshold++){    
-
-        
-        
-        double total = 0;
-        //cout << "multiplying matrices, n = " << i << endl;
-        for (int j = 0; j < 10; j ++){
-            total += timeRandMult(1024);
-        }
-
-        cout << threshold << "\t" << total / 10 << endl;
-
-        //cout << "finished multiplying.\n" << endl;
-        
-    }
-}
-
-
-
-
+// find optimal threshold to switch over from multithreading to sequential operation
 void findOptimalThreadThresh() {
-    threshold = 32;
+    convThreshold = 32;
     threadThresh = 64;
     while (threadThresh != 4096){
         //cout << threadThresh << endl;;
@@ -408,7 +436,9 @@ void findOptimalThreadThresh() {
     }
 }
 
-
+/*
+ * unit tests for methods
+ */
 void testRandMatrix(){
     Matrix* m = new Matrix();
     initMatrix(m,10);
@@ -449,7 +479,7 @@ void testConvMult(){
 }
 
 void testStrasMult(){
-    threshold = 2;
+    convThreshold = 2;
     //First test
     Matrix* A = new Matrix();
     initMatrix(A,2);
@@ -622,18 +652,32 @@ void testInitPadding(){
 
 void testPowers2(){
     for (int i = 2; i <= 4096; i *= 2){
-        double total = 0;
-        for (int j = 0; j < 10; ++j)
-        {
-            total += timeRandMult(i);
-        }
-        cout << i << "\t" <<  total / 10 << endl;
+        Matrix* m1 = new Matrix();
+        initMatrix(m1, i);
+        Matrix* m2 = new Matrix();
+        initMatrix(m2, i);
+        //cout << "populating m1" << endl;
+        populateRandomMatrix(m1, -10, 10);
+        //cout << "populating m2" << endl;
+        populateRandomMatrix(m2, -10, 10);
+        
+        //cout << "multiplying matrices, n = " << i << endl;
+        clock_t start;
+        start = clock();
+        Matrix* m3 = multiply(m1, m2);
+        
+
+        cout << "multiplied " << i << "x" << i << " in " << ((double) (clock() - start) / (double)(CLOCKS_PER_SEC)) << "s" << endl;
+        delete(m1);
+        delete(m2);
+        delete(m3);
+
     }
 
 }
 
 
-
+// convert from newline separated values to matrix type
 Matrix* FileToMatrix(char* inputfile, int dimension, int order){
     Matrix* M = new Matrix();
     initMatrix(M, dimension);
@@ -658,10 +702,10 @@ Matrix* FileToMatrix(char* inputfile, int dimension, int order){
 }
 
 
-
+// print diagonal of output matrix
 void printDiagonal(Matrix* M, int dimension){
     for (int i = 0; i < dimension; ++i) {
-        cout << M->matrix[i][i] << endl;
+        printf("%d\n", M->matrix[i][i]);
     }
 }
 
@@ -670,13 +714,39 @@ void printDiagonal(Matrix* M, int dimension){
 
 
 int main(int argc, char *argv[]){
-    if (argc != 4)
+    convThreshold = 32;
+    threadThresh = 512;
+    if (argc == 2){
+        switch (stoi(argv[1])){
+            case 1:
+                testStrasMult();
+            case 2:
+                testConvMult();
+            case 3:
+                testfindOptDim();
+            case 4:
+                testInitPadding();
+            case 5:
+                testRandMatrix();
+            case 6:
+                testPowers2();
+            case 7:
+                findOptimalThreadThresh();
+            case 8:
+                findOptimalconvThreshold();
+        }
+        return 0;
+
+    }
+    else if (argc == 3 && stoi(argv[1]) == 9){
+        cout << timeRandMult(stoi(argv[2]));
+    }
+    else if (argc != 4)
         std::cout<<"Incorrect numargs, proper: \'0 dimension inputfile\'";
     else
     {
         
-        threshold = 32;
-        threadThresh = 512;
+       
 
 
         int customFlag = atoi(argv[1]);
@@ -691,23 +761,8 @@ int main(int argc, char *argv[]){
         Matrix* C = multiply(A,B);
 
         printDiagonal(C, dimension);
-
-
-    //    testStrasMult();
-    //    testConvMult();
-    //    testfindOptDim();
-    //    testInitPadding();
-    //    testRandMatrix();
-    //    timeRandMult(4096);
-
-    //    testPowers2();
-        findOptimalThreshold();
-        findOptimalThreadThresh();
-    
     }
     
     return 0;
 
 }
-
-
