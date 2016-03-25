@@ -720,20 +720,30 @@ int main(int argc, char *argv[]){
         switch (stoi(argv[1])){
             case 1:
                 testStrasMult();
+                return 0;
             case 2:
                 testConvMult();
+                return 0;
             case 3:
                 testfindOptDim();
+                return 0;
             case 4:
                 testInitPadding();
+                return 0;
             case 5:
                 testRandMatrix();
+                return 0;
             case 6:
                 testPowers2();
+                return 0;
             case 7:
                 findOptimalThreadThresh();
+                return 0;
             case 8:
                 findOptimalconvThreshold();
+                return 0;
+            default:
+                return -1;
         }
         return 0;
 
@@ -743,13 +753,8 @@ int main(int argc, char *argv[]){
     }
     else if (argc != 4)
         std::cout<<"Incorrect numargs, proper: \'0 dimension inputfile\'";
-    else
+    else if (argv[1] == 0)
     {
-        
-       
-
-
-        int customFlag = atoi(argv[1]);
         int dimension = atoi(argv[2]);
         char* inputfile = argv[3];
 
@@ -761,8 +766,9 @@ int main(int argc, char *argv[]){
         Matrix* C = multiply(A,B);
 
         printDiagonal(C, dimension);
+        return 0;
     }
     
-    return 0;
+    else return -1;
 
 }
