@@ -753,7 +753,7 @@ int main(int argc, char *argv[]){
     }
     else if (argc != 4)
         std::cout<<"Incorrect numargs, proper: \'0 dimension inputfile\'";
-    else if (argv[1] == 0)
+    else if (stoi(argv[1]) == 0)
     {
         int dimension = atoi(argv[2]);
         char* inputfile = argv[3];
